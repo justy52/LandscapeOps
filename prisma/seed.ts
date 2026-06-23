@@ -13,6 +13,10 @@
 
 import { PrismaClient } from "@prisma/client";
 
+if (process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production") {
+  throw new Error("Refusing to run demo seed data in a production environment.");
+}
+
 const prisma = new PrismaClient();
 
 async function main() {

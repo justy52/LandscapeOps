@@ -183,9 +183,19 @@ async function handleMembershipCreated(
   orgId: string,
   clerkUserId: string
 ) {
+  const existingProfile = await prisma.userProfile.findUnique({
+    where: { orgId_clerkUserId: { orgId, clerkUserId } },
+    select: { id: true, role: true },
+  });
+
   // First member in the org is automatically promoted to OWNER
-  const existingCount = await prisma.userProfile.count({ where: { orgId } });
-  const role = existingCount === 0 ? "OWNER" : mapClerkRole(data.role);
+  const existingCount = existingProfile ? 1 : await prisma.userProfile.count({ where: { orgId } });
+  const role =
+    existingProfile?.role === "OWNER"
+      ? "OWNER"
+      : existingCount === 0
+        ? "OWNER"
+        : mapClerkRole(data.role);
 
   const fullName =
     [data.public_user_data.first_name, data.public_user_data.last_name]
