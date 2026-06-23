@@ -17,3 +17,7 @@ Mobile should not be an afterthought. Navigation can become a horizontal strip o
 ## Empty States
 
 Empty states should be confident and useful. They should explain the operational state, not apologize. Avoid cartoonish illustration; use refined iconography and direct calls to action.
+
+## Phase 0 Polish Notes
+
+The Phase 0 dashboard preview should read as an operations command center, not a landing page. Favor executive metrics, today's priorities, crew dispatch context, field signals, AR/margin language, and module entry points. Mobile navigation should stay close to the thumb and keep Dashboard, Leads, Estimates, and Jobs immediately reachable while later phases define deeper route behavior.

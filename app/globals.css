@@ -32,15 +32,16 @@
 html {
   min-height: 100%;
   background:
-    radial-gradient(circle at top left, rgba(183, 138, 56, 0.18), transparent 34rem),
-    linear-gradient(135deg, #111b23 0%, #151917 46%, #244839 100%);
+    radial-gradient(circle at top left, rgba(183, 138, 56, 0.2), transparent 34rem),
+    radial-gradient(circle at bottom right, rgba(36, 72, 57, 0.34), transparent 28rem),
+    linear-gradient(135deg, #111b23 0%, #151917 48%, #244839 100%);
 }
 
 body {
   min-height: 100vh;
   color: hsl(var(--foreground));
   background:
-    linear-gradient(180deg, rgba(17, 27, 35, 0.96) 0%, rgba(17, 27, 35, 0.86) 35%, rgba(245, 240, 231, 0.98) 35%),
+    linear-gradient(180deg, rgba(17, 27, 35, 0.96) 0%, rgba(17, 27, 35, 0.9) 30%, rgba(245, 240, 231, 0.98) 30%),
     hsl(var(--background));
   font-feature-settings:
     "rlig" 1,
@@ -53,9 +54,34 @@ body {
 
 .premium-surface {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(251, 247, 239, 0.96)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(251, 247, 239, 0.98)),
     #fbf7ef;
-  box-shadow: 0 28px 80px rgba(9, 15, 18, 0.16);
+  box-shadow: 0 28px 80px rgba(9, 15, 18, 0.14);
+}
+
+.premium-card {
+  border-radius: var(--radius);
+  border: 1px solid rgba(214, 204, 187, 0.92);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(251, 247, 239, 0.96)),
+    #fbf7ef;
+  box-shadow:
+    0 20px 55px rgba(17, 27, 35, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.dark-panel {
+  background:
+    linear-gradient(145deg, rgba(21, 25, 23, 0.98), rgba(17, 27, 35, 0.98)),
+    #111b23;
+  box-shadow: 0 28px 80px rgba(9, 15, 18, 0.24);
+}
+
+.soft-grid {
+  background-image:
+    linear-gradient(rgba(21, 25, 23, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21, 25, 23, 0.035) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
 .status-dot {
