@@ -11,6 +11,11 @@ jobs:
     name: Install, lint, typecheck, and build
     runs-on: ubuntu-latest
 
+    env:
+      # Clerk requires a publishable key at build time even without a real Clerk app.
+      # This placeholder satisfies the build-time check; real keys live in deployment env vars.
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dGVzdGtleWZvcmNpYnVpbGRvbmx5
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,3 +40,6 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Test
+        run: npm test

@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { navigationItems } from "@/lib/constants";
-import { Bell, ChevronDown, Search, ShieldCheck, Sparkles } from "lucide-react";
+import { OrgSwitcher } from "@/components/org-switcher";
+import { UserButton } from "@/components/user-button";
+import { Bell, Search, ShieldCheck } from "lucide-react";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -101,10 +103,6 @@ export function AppShell({ children }: { children: ReactNode }) {
               </div>
 
               <div className="ml-auto flex items-center gap-2">
-                <span className="hidden items-center gap-2 rounded-full bg-white/8 px-3 py-2 text-xs font-semibold text-landscape-cream/72 ring-1 ring-white/10 sm:inline-flex">
-                  <Sparkles className="h-3.5 w-3.5 text-landscape-brass" aria-hidden="true" />
-                  Phase 0 preview
-                </span>
                 <button
                   type="button"
                   className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-white/10 bg-white/8 text-landscape-cream transition hover:bg-white/14 focus:outline-none focus:ring-2 focus:ring-landscape-brass"
@@ -112,13 +110,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                 >
                   <Bell className="h-4 w-4" aria-hidden="true" />
                 </button>
-                <button
-                  type="button"
-                  className="inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-white/10 bg-white/8 px-3 text-sm font-semibold text-landscape-cream transition hover:bg-white/14 focus:outline-none focus:ring-2 focus:ring-landscape-brass"
-                >
-                  High Mesa
-                  <ChevronDown className="h-4 w-4" aria-hidden="true" />
-                </button>
+                {/* Live Clerk org switcher — replaces Phase 0 static "High Mesa" button */}
+                <OrgSwitcher />
+                <UserButton />
               </div>
             </div>
           </header>
