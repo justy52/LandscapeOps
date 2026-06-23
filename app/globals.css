@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 34 39% 96%;
+  --foreground: 150 11% 12%;
+  --card: 38 48% 98%;
+  --card-foreground: 150 11% 12%;
+  --popover: 38 48% 98%;
+  --popover-foreground: 150 11% 12%;
+  --primary: 148 32% 22%;
+  --primary-foreground: 42 42% 94%;
+  --secondary: 42 34% 88%;
+  --secondary-foreground: 150 11% 12%;
+  --muted: 39 24% 90%;
+  --muted-foreground: 154 7% 39%;
+  --accent: 39 53% 47%;
+  --accent-foreground: 150 12% 10%;
+  --destructive: 3 68% 46%;
+  --destructive-foreground: 40 42% 96%;
+  --border: 40 22% 82%;
+  --input: 40 22% 82%;
+  --ring: 40 53% 50%;
+  --radius: 0.5rem;
+}
+
+* {
+  @apply border-border;
+}
+
+html {
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top left, rgba(183, 138, 56, 0.18), transparent 34rem),
+    linear-gradient(135deg, #111b23 0%, #151917 46%, #244839 100%);
+}
+
+body {
+  min-height: 100vh;
+  color: hsl(var(--foreground));
+  background:
+    linear-gradient(180deg, rgba(17, 27, 35, 0.96) 0%, rgba(17, 27, 35, 0.86) 35%, rgba(245, 240, 231, 0.98) 35%),
+    hsl(var(--background));
+  font-feature-settings:
+    "rlig" 1,
+    "calt" 1;
+}
+
+::selection {
+  background: rgba(183, 138, 56, 0.28);
+}
+
+.premium-surface {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(251, 247, 239, 0.96)),
+    #fbf7ef;
+  box-shadow: 0 28px 80px rgba(9, 15, 18, 0.16);
+}
+
+.status-dot {
+  display: inline-block;
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 9999px;
+}

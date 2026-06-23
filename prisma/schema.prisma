@@ -1,0 +1,300 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// Organization maps to a Clerk organization. Tenant-owned records must always be queried through orgId.
+model Organization {
+  id              String        @id @default(cuid())
+  clerkOrgId      String        @unique
+  name            String
+  slug            String        @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  users           UserProfile[]
+  customers       Customer[]
+  leads           Lead[]
+  estimates       Estimate[]
+  jobs            Job[]
+  invoices        Invoice[]
+  payments        Payment[]
+  fileAssets      FileAsset[]
+  auditLogs       AuditLog[]
+}
+
+/// TENANT SAFETY: all UserProfile reads and writes must be scoped to orgId from the active Clerk organization.
+model UserProfile {
+  id             String       @id @default(cuid())
+  orgId          String
+  clerkUserId    String
+  email          String
+  name           String?
+  role           UserRole     @default(MEMBER)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  assignedLeads  Lead[]       @relation("LeadAssignee")
+  assignedJobs   Job[]        @relation("JobManager")
+  auditLogs      AuditLog[]
+
+  @@unique([orgId, clerkUserId])
+  @@index([orgId, email])
+}
+
+/// TENANT SAFETY: all Customer queries must include orgId.
+model Customer {
+  id           String       @id @default(cuid())
+  orgId        String
+  name         String
+  companyName  String?
+  email        String?
+  phone        String?
+  addressLine1 String?
+  addressLine2 String?
+  city         String?
+  state        String?
+  postalCode   String?
+  notes        String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  leads        Lead[]
+  estimates    Estimate[]
+  jobs         Job[]
+  invoices     Invoice[]
+  files        FileAsset[]
+
+  @@index([orgId, name])
+  @@index([orgId, email])
+}
+
+/// TENANT SAFETY: all Lead queries must include orgId.
+model Lead {
+  id             String       @id @default(cuid())
+  orgId          String
+  customerId     String?
+  assignedToId   String?
+  title          String
+  source         String?
+  status         LeadStatus   @default(NEW)
+  budgetCents    Int?
+  siteAddress    String?
+  nextActionAt   DateTime?
+  notes          String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  customer       Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  assignedTo     UserProfile? @relation("LeadAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+  estimates      Estimate[]
+  files          FileAsset[]
+
+  @@index([orgId, status])
+  @@index([orgId, nextActionAt])
+}
+
+/// TENANT SAFETY: all Estimate queries must include orgId.
+model Estimate {
+  id             String         @id @default(cuid())
+  orgId          String
+  customerId     String
+  leadId         String?
+  jobId          String?
+  number         String
+  title          String
+  status         EstimateStatus @default(DRAFT)
+  subtotalCents  Int            @default(0)
+  taxCents       Int            @default(0)
+  totalCents     Int            @default(0)
+  marginPercent  Decimal?       @db.Decimal(5, 2)
+  sentAt         DateTime?
+  approvedAt     DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  organization   Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  customer       Customer       @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  lead           Lead?          @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  job            Job?           @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  files          FileAsset[]
+
+  @@unique([orgId, number])
+  @@index([orgId, status])
+}
+
+/// TENANT SAFETY: all Job queries must include orgId.
+model Job {
+  id              String        @id @default(cuid())
+  orgId           String
+  customerId      String
+  managerId       String?
+  name            String
+  status          JobStatus     @default(PLANNING)
+  startDate       DateTime?
+  endDate         DateTime?
+  contractValueCents Int        @default(0)
+  estimatedCostCents Int        @default(0)
+  actualCostCents Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  organization    Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  customer        Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  manager         UserProfile?  @relation("JobManager", fields: [managerId], references: [id], onDelete: SetNull)
+  estimates       Estimate[]
+  invoices        Invoice[]
+  files           FileAsset[]
+
+  @@index([orgId, status])
+  @@index([orgId, startDate])
+}
+
+/// TENANT SAFETY: all Invoice queries must include orgId.
+model Invoice {
+  id            String        @id @default(cuid())
+  orgId         String
+  customerId    String
+  jobId         String?
+  number        String
+  status        InvoiceStatus @default(DRAFT)
+  subtotalCents Int           @default(0)
+  taxCents      Int           @default(0)
+  totalCents    Int           @default(0)
+  amountPaidCents Int         @default(0)
+  dueDate       DateTime?
+  sentAt        DateTime?
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  organization  Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  customer      Customer      @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  job           Job?          @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  payments      Payment[]
+  files         FileAsset[]
+
+  @@unique([orgId, number])
+  @@index([orgId, status])
+  @@index([orgId, dueDate])
+}
+
+/// TENANT SAFETY: all Payment queries must include orgId.
+model Payment {
+  id               String        @id @default(cuid())
+  orgId            String
+  invoiceId        String
+  provider         PaymentProvider @default(STRIPE)
+  providerPaymentId String?
+  amountCents      Int
+  status           PaymentStatus @default(PENDING)
+  receivedAt       DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  organization     Organization  @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  invoice          Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([orgId, status])
+  @@index([orgId, invoiceId])
+}
+
+/// TENANT SAFETY: all FileAsset queries must include orgId.
+model FileAsset {
+  id            String       @id @default(cuid())
+  orgId         String
+  customerId    String?
+  leadId        String?
+  estimateId    String?
+  jobId         String?
+  invoiceId     String?
+  bucket        String
+  objectKey     String
+  fileName      String
+  contentType   String?
+  byteSize      Int?
+  checksum      String?
+  createdAt     DateTime     @default(now())
+  organization  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  customer      Customer?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  lead          Lead?        @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  estimate      Estimate?    @relation(fields: [estimateId], references: [id], onDelete: SetNull)
+  job           Job?         @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  invoice       Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+
+  @@unique([orgId, objectKey])
+  @@index([orgId, createdAt])
+}
+
+/// TENANT SAFETY: all AuditLog queries must include orgId.
+model AuditLog {
+  id           String       @id @default(cuid())
+  orgId        String
+  actorId      String?
+  action       String
+  entityType   String
+  entityId     String?
+  metadata     Json?
+  createdAt    DateTime     @default(now())
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  actor        UserProfile? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([orgId, entityType, entityId])
+  @@index([orgId, createdAt])
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  MANAGER
+  FIELD
+  MEMBER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  ESTIMATE_REQUESTED
+  WON
+  LOST
+}
+
+enum EstimateStatus {
+  DRAFT
+  INTERNAL_REVIEW
+  SENT
+  APPROVED
+  DECLINED
+  EXPIRED
+}
+
+enum JobStatus {
+  PLANNING
+  SCHEDULED
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETE
+  CLOSED
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  VOID
+}
+
+enum PaymentProvider {
+  STRIPE
+  MANUAL
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}

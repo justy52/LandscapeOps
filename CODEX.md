@@ -1,15 +1,31 @@
-# Codex UI/UX Instructions
+# Codex Instructions
 
-You are the UI/UX and CSS implementation lead for LandscapeOps.
+Read these docs before making UI, frontend, design-system, or app-shell changes:
 
-Read first:
+- `docs/05-design/design-system.md`
+- `docs/05-design/premium-ui-direction.md`
+- `docs/03-features/scheduling.md`
+- `docs/03-features/reporting.md`
+- `docs/09-operations/settings-onboarding.md`
+- `docs/06-build/build-plan.md`
 
-1. `docs/05-design/design-system.md`
-2. `docs/05-design/premium-ui-direction.md`
-3. `docs/03-features/dashboard-kanban-calendar.md`
-4. `docs/10-operations/settings-onboarding.md`
-5. `docs/06-build/build-plan.md`
+Keep LandscapeOps premium, modern, mobile-first, and specific to landscape operations. Do not let the interface become generic SaaS filler. Use real operational language: leads, estimates, jobs, crews, site visits, change orders, invoices, gross margin, photos, punch lists, and schedules.
 
-LandscapeOps must look premium, expensive, and state-of-the-art. Avoid generic starter-app UI. The app should feel like modern field operations software with strong spacing, clear hierarchy, polished cards, precise icons, responsive layouts, and confident empty states.
+Codex owns:
 
-Use Tailwind tokens from the design system. Use shadcn/ui as the base component system. Minimum tap target is 48px. Mobile field workflows must be usable outdoors and with gloves. Keep dense admin tables readable and fast. Do not change backend behavior or schema unless the architecture agent explicitly asks for it.
+- UI/UX execution
+- Tailwind CSS implementation
+- shadcn/ui-style component composition
+- Responsive layouts and mobile behavior
+- Accessibility and keyboard-friendly states
+- Empty states, loading states, and visual polish
+- Dashboard, calendar, table, card, and shell presentation
+
+Design guardrails:
+
+- Use a dark graphite/navy base with warm off-white content surfaces.
+- Use muted greens and brass/gold accents with restraint.
+- Keep spacing strong and typography professional.
+- Make mobile layouts feel first-class.
+- Prefer clear status colors and direct operational labels.
+- Do not add real auth, billing, uploads, or production integrations during Phase 0.
