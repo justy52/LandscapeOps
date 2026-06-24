@@ -25,9 +25,10 @@ import {
 } from "lucide-react";
 
 export const navigationItems = [
-  { name: "Dashboard", href: "#dashboard", icon: LayoutDashboard },
-  { name: "Leads", href: "#leads", icon: Users },
-  { name: "Estimates", href: "#estimates", icon: FileText },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Customers", href: "/dashboard/crm/customers", icon: Users },
+  { name: "Leads", href: "/dashboard/crm/leads", icon: Sprout },
+  { name: "Estimates", href: "/dashboard/crm/estimates", icon: FileText },
   { name: "Jobs", href: "#jobs", icon: BriefcaseBusiness },
   { name: "Schedule", href: "#schedule", icon: CalendarDays },
   { name: "Field Ops", href: "#field-ops", icon: HardHat },
@@ -224,13 +225,13 @@ export const pipelinePreview = [
 export const readinessSignals = [
   {
     label: "Org-scoped UI preview",
-    detail: "Static demo only",
+    detail: "CRM pages protected",
     icon: ShieldCheck,
     tone: "green" as const
   },
   {
-    label: "No live queries",
-    detail: "Phase 1 auth remains deferred",
+    label: "Service-layer writes",
+    detail: "Actions guard org scope",
     icon: AlertTriangle,
     tone: "amber" as const
   },

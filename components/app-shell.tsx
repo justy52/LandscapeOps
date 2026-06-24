@@ -5,14 +5,22 @@ import { OrgSwitcher } from "@/components/org-switcher";
 import { UserButton } from "@/components/user-button";
 import { Bell, Search, ShieldCheck } from "lucide-react";
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({
+  children,
+  activeHref = "/dashboard",
+  contentId = "dashboard",
+}: {
+  children: ReactNode;
+  activeHref?: string;
+  contentId?: string;
+}) {
   return (
     <main className="min-h-screen bg-landscape-cream/95 text-landscape-graphite">
       <a
-        href="#dashboard"
+        href={`#${contentId}`}
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-landscape-brass focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-landscape-graphite"
       >
-        Skip to dashboard
+        Skip to content
       </a>
 
       <div className="min-h-screen lg:grid lg:grid-cols-[19rem_1fr]">
@@ -40,27 +48,31 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
 
             <nav className="mt-7 space-y-1" aria-label="Primary navigation">
-              {navigationItems.map((item, index) => (
+              {navigationItems.map((item) => {
+                const isActive = item.href === activeHref;
+
+                return (
                 <a
                   key={item.name}
-                  aria-current={index === 0 ? "page" : undefined}
+                  aria-current={isActive ? "page" : undefined}
                   className={cn(
                     "group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-landscape-cream/68 transition hover:bg-white/8 hover:text-landscape-cream focus:outline-none focus:ring-2 focus:ring-landscape-brass",
-                    index === 0 && "bg-white/12 text-landscape-cream shadow-inset"
+                    isActive && "bg-white/12 text-landscape-cream shadow-inset"
                   )}
                   href={item.href}
                 >
                   <span
                     className={cn(
                       "flex h-8 w-8 items-center justify-center rounded-md bg-white/6 text-landscape-cream/64 transition group-hover:bg-landscape-brass/16 group-hover:text-landscape-brass",
-                      index === 0 && "bg-landscape-brass text-landscape-graphite"
+                      isActive && "bg-landscape-brass text-landscape-graphite"
                     )}
                   >
                     <item.icon className="h-4 w-4" aria-hidden="true" />
                   </span>
                   {item.name}
                 </a>
-              ))}
+                );
+              })}
             </nav>
 
             <div className="mt-auto space-y-3">
@@ -70,7 +82,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   Tenant-safe posture
                 </div>
                 <p className="mt-2 text-xs leading-5 text-landscape-cream/62">
-                  Phase 0 stays static while Phase 1 defines Clerk org resolution and org-scoped data access.
+                  Phase 2 CRM screens resolve org access server-side and keep mutations behind role guards.
                 </p>
               </div>
               <div className="rounded-lg border border-landscape-brass/20 bg-landscape-brass/10 px-4 py-3 text-xs font-semibold text-landscape-brass">
@@ -128,20 +140,24 @@ export function AppShell({ children }: { children: ReactNode }) {
         aria-label="Mobile command navigation"
       >
         <div className="grid grid-cols-4 gap-1">
-          {navigationItems.slice(0, 4).map((item, index) => (
+          {navigationItems.slice(0, 4).map((item) => {
+            const isActive = item.href === activeHref;
+
+            return (
             <a
               key={item.name}
               href={item.href}
-              aria-current={index === 0 ? "page" : undefined}
+              aria-current={isActive ? "page" : undefined}
               className={cn(
                 "flex min-h-14 flex-col items-center justify-center gap-1 rounded-md px-2 text-[0.68rem] font-semibold text-landscape-cream/66 transition hover:bg-white/8 hover:text-landscape-cream focus:outline-none focus:ring-2 focus:ring-landscape-brass",
-                index === 0 && "bg-white/12 text-landscape-cream"
+                isActive && "bg-white/12 text-landscape-cream"
               )}
             >
               <item.icon className="h-4 w-4" aria-hidden="true" />
               {item.name}
             </a>
-          ))}
+            );
+          })}
         </div>
       </nav>
     </main>

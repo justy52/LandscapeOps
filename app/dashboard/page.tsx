@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { DashboardCard } from "@/components/dashboard-card";
 import { PremiumHeader } from "@/components/premium-header";
@@ -54,25 +55,25 @@ export default function DashboardPage() {
   return (
     <AppShell>
       <PremiumHeader
-        eyebrow="Phase 1 dashboard"
+        eyebrow="Phase 2 dashboard"
         title="A premium command center for landscape operators."
-        description="Pipeline, crews, site files, invoices, AR, and margin signals are staged for fast owner and ops-manager decisions."
+        description="CRM and estimating scaffolds are live beside the broader operating preview for crews, jobs, AR, and margin signals."
         actions={
           <>
-            <button
-              type="button"
+            <Link
+              href="/dashboard/crm/leads/new"
               className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-landscape-brass px-4 text-sm font-semibold text-landscape-graphite shadow-inset transition hover:bg-[#c59844] focus:outline-none focus:ring-2 focus:ring-landscape-brass focus:ring-offset-2 focus:ring-offset-landscape-navy"
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
               New lead
-            </button>
-            <button
-              type="button"
+            </Link>
+            <Link
+              href="/dashboard/crm/estimates/new"
               className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-white/16 bg-white/8 px-4 text-sm font-semibold text-landscape-cream transition hover:bg-white/14 focus:outline-none focus:ring-2 focus:ring-landscape-brass"
             >
               <FileText className="h-4 w-4" aria-hidden="true" />
               Draft estimate
-            </button>
+            </Link>
           </>
         }
       />
@@ -259,7 +260,7 @@ export default function DashboardPage() {
             </h2>
           </div>
           <p className="max-w-xl text-sm leading-6 text-stone-600">
-            Phase 1 auth is live. CRM, estimating, jobs, and billing modules activate in later phases.
+            Phase 2 CRM and estimating routes are live. Jobs, billing, integrations, and reporting remain staged for later phases.
           </p>
         </div>
 
@@ -293,10 +294,10 @@ export default function DashboardPage() {
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-lg bg-landscape-pine text-landscape-cream">
           <Leaf className="h-6 w-6" aria-hidden="true" />
         </div>
-        <h2 className="mt-4 text-lg font-semibold text-landscape-graphite">Phase 1 auth and tenant core</h2>
+        <h2 className="mt-4 text-lg font-semibold text-landscape-graphite">Phase 2 CRM and estimating scaffold</h2>
         <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-stone-600">
-          Clerk auth, organization sync, tenant-safe Prisma patterns, role guards, and webhook sync are live.
-          CRM, estimating, scheduling, invoicing, and reporting activate in later phases.
+          Clerk auth, organization sync, tenant-safe Prisma patterns, role guards, and Phase 2 CRM actions are live.
+          Jobs, scheduling, invoicing, payments, contracts, uploads, and integrations remain staged for later phases.
         </p>
         <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs font-semibold text-stone-700">
           <span className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 ring-1 ring-stone-200">
