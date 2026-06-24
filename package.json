@@ -35,7 +35,8 @@
     "stripe": "16",
     "svix": "^1.96.0",
     "tailwind-merge": "2",
-    "twilio": "5"
+    "twilio": "5",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "20",

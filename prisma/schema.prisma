@@ -70,6 +70,9 @@ model Customer {
   invoices     Invoice[]
   files        FileAsset[]
 
+  // @@unique([id, orgId]) enables future composite FK references from Estimate,
+  // Lead, and Job. Added in Phase 2 per tenant-isolation-rules.md decision.
+  @@unique([id, orgId])
   @@index([orgId, name])
   @@index([orgId, email])
 }
@@ -95,6 +98,9 @@ model Lead {
   estimates      Estimate[]
   files          FileAsset[]
 
+  // @@unique([id, orgId]) enables future composite FK references from Estimate.
+  // Added in Phase 2 per tenant-isolation-rules.md decision.
+  @@unique([id, orgId])
   @@index([orgId, status])
   @@index([orgId, nextActionAt])
 }
@@ -123,6 +129,9 @@ model Estimate {
   job            Job?           @relation(fields: [jobId], references: [id], onDelete: SetNull)
   files          FileAsset[]
 
+  // @@unique([id, orgId]) enables future composite FK references from Job.
+  // Added in Phase 2 per tenant-isolation-rules.md decision.
+  @@unique([id, orgId])
   @@unique([orgId, number])
   @@index([orgId, status])
 }
