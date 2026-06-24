@@ -4,7 +4,7 @@ import { LeadStatus } from "@prisma/client";
 export const CreateLeadSchema = z.object({
   title: z.string().min(1).max(255),
   source: z.string().max(100).optional(),
-  budgetCents: z.number().int().nonnegative().optional(),
+  budgetCents: z.number().int().nonnegative().max(2_147_483_647).optional(),
   siteAddress: z.string().max(500).optional(),
   nextActionAt: z.coerce.date().optional(),
   notes: z.string().max(10_000).optional(),

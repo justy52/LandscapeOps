@@ -5,19 +5,21 @@ import { EstimateStatus } from "@prisma/client";
 // It is intentionally absent from all input schemas.
 // Estimate.number is generated server-side; it is also absent from input schemas.
 
+const PRISMA_INT_MAX = 2_147_483_647;
+
 export const CreateEstimateSchema = z.object({
   title: z.string().min(1).max(255),
   customerId: z.string().cuid(),
   leadId: z.string().cuid().optional(),
-  subtotalCents: z.number().int().nonnegative().default(0),
-  taxCents: z.number().int().nonnegative().default(0),
+  subtotalCents: z.number().int().nonnegative().max(PRISMA_INT_MAX).default(0),
+  taxCents: z.number().int().nonnegative().max(PRISMA_INT_MAX).default(0),
   marginPercent: z.number().min(0).max(100).optional(),
 });
 
 export const UpdateEstimateSchema = z.object({
   title: z.string().min(1).max(255).optional(),
-  subtotalCents: z.number().int().nonnegative().optional(),
-  taxCents: z.number().int().nonnegative().optional(),
+  subtotalCents: z.number().int().nonnegative().max(PRISMA_INT_MAX).optional(),
+  taxCents: z.number().int().nonnegative().max(PRISMA_INT_MAX).optional(),
   marginPercent: z.number().min(0).max(100).optional(),
 });
 

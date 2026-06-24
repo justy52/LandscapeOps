@@ -197,8 +197,14 @@ export async function createCustomerAction(
   const parsed = parseActionInput(CreateCustomerSchema, customerInput(formData));
   if (parsed.state) return parsed.state;
 
+  let customer: Awaited<ReturnType<typeof createCustomer>>;
   try {
-    const customer = await createCustomer(orgId, parsed.input);
+    customer = await createCustomer(orgId, parsed.input);
+  } catch (error) {
+    return errorState(error);
+  }
+
+  try {
     await writeAuditLog({
       orgId,
       actorId: profile.id,
@@ -210,8 +216,8 @@ export async function createCustomerAction(
         companyName: customer.companyName,
       },
     });
-  } catch (error) {
-    return errorState(error);
+  } catch {
+    // best-effort — log failure never masks a successful write
   }
 
   revalidatePath("/dashboard/crm/customers");
@@ -227,22 +233,28 @@ export async function updateCustomerAction(
   const parsed = parseActionInput(UpdateCustomerSchema, customerInput(formData));
   if (parsed.state) return parsed.state;
 
+  let auditEntityId: string;
   try {
     const customer = await updateCustomer(orgId, customerId, parsed.input);
     if (!customer) {
       return { ok: false, message: "Customer not found in this organization." };
     }
+    auditEntityId = customer.id;
+  } catch (error) {
+    return errorState(error);
+  }
 
+  try {
     await writeAuditLog({
       orgId,
       actorId: profile.id,
       action: "customer.updated",
       entityType: "Customer",
-      entityId: customer.id,
+      entityId: auditEntityId,
       metadata: { fields: changedFields(parsed.input) },
     });
-  } catch (error) {
-    return errorState(error);
+  } catch {
+    // best-effort — log failure never masks a successful write
   }
 
   revalidatePath("/dashboard/crm/customers");
@@ -257,8 +269,14 @@ export async function createLeadAction(
   const parsed = parseActionInput(CreateLeadSchema, leadInput(formData));
   if (parsed.state) return parsed.state;
 
+  let lead: Awaited<ReturnType<typeof createLead>>;
   try {
-    const lead = await createLead(orgId, parsed.input);
+    lead = await createLead(orgId, parsed.input);
+  } catch (error) {
+    return errorState(error);
+  }
+
+  try {
     await writeAuditLog({
       orgId,
       actorId: profile.id,
@@ -270,8 +288,8 @@ export async function createLeadAction(
         source: lead.source,
       },
     });
-  } catch (error) {
-    return errorState(error);
+  } catch {
+    // best-effort — log failure never masks a successful write
   }
 
   revalidatePath("/dashboard/crm/leads");
@@ -287,22 +305,28 @@ export async function updateLeadAction(
   const parsed = parseActionInput(UpdateLeadSchema, leadInput(formData));
   if (parsed.state) return parsed.state;
 
+  let auditEntityId: string;
   try {
     const lead = await updateLead(orgId, leadId, parsed.input);
     if (!lead) {
       return { ok: false, message: "Lead not found in this organization." };
     }
+    auditEntityId = lead.id;
+  } catch (error) {
+    return errorState(error);
+  }
 
+  try {
     await writeAuditLog({
       orgId,
       actorId: profile.id,
       action: "lead.updated",
       entityType: "Lead",
-      entityId: lead.id,
+      entityId: auditEntityId,
       metadata: { fields: changedFields(parsed.input) },
     });
-  } catch (error) {
-    return errorState(error);
+  } catch {
+    // best-effort — log failure never masks a successful write
   }
 
   revalidatePath("/dashboard/crm/leads");
@@ -320,6 +344,9 @@ export async function updateLeadStatusAction(
   });
   if (parsed.state) return parsed.state;
 
+  let auditEntityId: string;
+  let auditFrom: string;
+  let auditTo: string;
   try {
     const previous = await getLead(orgId, leadId);
     if (!previous) {
@@ -331,16 +358,24 @@ export async function updateLeadStatusAction(
       return { ok: false, message: "Lead not found in this organization." };
     }
 
+    auditEntityId = lead.id;
+    auditFrom = previous.status;
+    auditTo = lead.status;
+  } catch (error) {
+    return errorState(error);
+  }
+
+  try {
     await writeAuditLog({
       orgId,
       actorId: profile.id,
       action: "lead.status_changed",
       entityType: "Lead",
-      entityId: lead.id,
-      metadata: { from: previous.status, to: lead.status },
+      entityId: auditEntityId,
+      metadata: { from: auditFrom, to: auditTo },
     });
-  } catch (error) {
-    return errorState(error);
+  } catch {
+    // best-effort — log failure never masks a successful write
   }
 
   revalidatePath("/dashboard/crm/leads");
@@ -357,22 +392,28 @@ export async function assignLeadAction(
   const parsed = parseActionInput(AssignLeadSchema, { assignedToId });
   if (parsed.state) return parsed.state;
 
+  let auditEntityId: string;
   try {
     const lead = await assignLead(orgId, leadId, parsed.input.assignedToId);
     if (!lead) {
       return { ok: false, message: "Lead not found in this organization." };
     }
+    auditEntityId = lead.id;
+  } catch (error) {
+    return errorState(error);
+  }
 
+  try {
     await writeAuditLog({
       orgId,
       actorId: profile.id,
       action: "lead.assigned",
       entityType: "Lead",
-      entityId: lead.id,
+      entityId: auditEntityId,
       metadata: { assignedToId: parsed.input.assignedToId },
     });
-  } catch (error) {
-    return errorState(error);
+  } catch {
+    // best-effort — log failure never masks a successful write
   }
 
   revalidatePath("/dashboard/crm/leads");
@@ -387,12 +428,14 @@ export async function createEstimateAction(
   const parsed = parseActionInput(CreateEstimateSchema, estimateInput(formData));
   if (parsed.state) return parsed.state;
 
-  let estimateId: string;
+  let estimate: Awaited<ReturnType<typeof createEstimate>>;
+  try {
+    estimate = await createEstimate(orgId, parsed.input);
+  } catch (error) {
+    return errorState(error);
+  }
 
   try {
-    const estimate = await createEstimate(orgId, parsed.input);
-    estimateId = estimate.id;
-
     await writeAuditLog({
       orgId,
       actorId: profile.id,
@@ -404,12 +447,12 @@ export async function createEstimateAction(
         status: estimate.status,
       },
     });
-  } catch (error) {
-    return errorState(error);
+  } catch {
+    // best-effort — log failure never masks a successful write
   }
 
   revalidatePath("/dashboard/crm/estimates");
-  redirect(`/dashboard/crm/estimates/${estimateId}`);
+  redirect(`/dashboard/crm/estimates/${estimate.id}`);
 }
 
 export async function updateEstimateAction(
@@ -421,25 +464,33 @@ export async function updateEstimateAction(
   const parsed = parseActionInput(UpdateEstimateSchema, estimateUpdateInput(formData));
   if (parsed.state) return parsed.state;
 
+  let auditEntityId: string;
+  let auditNumber: string;
   try {
     const estimate = await updateEstimate(orgId, estimateId, parsed.input);
     if (!estimate) {
       return { ok: false, message: "Estimate not found in this organization." };
     }
+    auditEntityId = estimate.id;
+    auditNumber = estimate.number;
+  } catch (error) {
+    return errorState(error);
+  }
 
+  try {
     await writeAuditLog({
       orgId,
       actorId: profile.id,
       action: "estimate.updated",
       entityType: "Estimate",
-      entityId: estimate.id,
+      entityId: auditEntityId,
       metadata: {
-        number: estimate.number,
+        number: auditNumber,
         fields: changedFields(parsed.input),
       },
     });
-  } catch (error) {
-    return errorState(error);
+  } catch {
+    // best-effort — log failure never masks a successful write
   }
 
   revalidatePath("/dashboard/crm/estimates");
@@ -460,6 +511,10 @@ export async function transitionEstimateStatusAction(
   );
   if (parsed.state) return parsed.state;
 
+  let auditEntityId: string;
+  let auditNumber: string;
+  let auditFrom: string;
+  let auditTo: string;
   try {
     const previous = await getEstimate(orgId, estimateId);
     if (!previous) {
@@ -475,20 +530,29 @@ export async function transitionEstimateStatusAction(
       return { ok: false, message: "Estimate not found in this organization." };
     }
 
+    auditEntityId = estimate.id;
+    auditNumber = estimate.number;
+    auditFrom = previous.status;
+    auditTo = estimate.status;
+  } catch (error) {
+    return errorState(error);
+  }
+
+  try {
     await writeAuditLog({
       orgId,
       actorId: profile.id,
       action: "estimate.status_changed",
       entityType: "Estimate",
-      entityId: estimate.id,
+      entityId: auditEntityId,
       metadata: {
-        number: estimate.number,
-        from: previous.status,
-        to: estimate.status,
+        number: auditNumber,
+        from: auditFrom,
+        to: auditTo,
       },
     });
-  } catch (error) {
-    return errorState(error);
+  } catch {
+    // best-effort — log failure never masks a successful write
   }
 
   revalidatePath("/dashboard/crm/estimates");
