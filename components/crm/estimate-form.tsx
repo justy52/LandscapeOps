@@ -6,6 +6,10 @@ import { emptyActionState, type ActionState } from "@/lib/action-state";
 import { FieldError, FormMessage } from "@/components/crm/form-message";
 import type { CustomerOption } from "@/components/crm/lead-form";
 import { SubmitButton } from "@/components/crm/submit-button";
+import {
+  getEstimateStatusLabel,
+  getEstimateStatusTransitions,
+} from "@/lib/constants/estimate-transitions";
 
 type EstimateFormAction = (
   state: ActionState,
@@ -33,24 +37,6 @@ type EstimateFormProps = {
   estimate?: EstimateFormValues;
   submitLabel: string;
   mode: "create" | "edit";
-};
-
-const estimateStatusLabels: Record<string, string> = {
-  DRAFT: "Draft",
-  INTERNAL_REVIEW: "Internal review",
-  SENT: "Sent",
-  APPROVED: "Approved",
-  DECLINED: "Declined",
-  EXPIRED: "Expired",
-};
-
-const estimateTransitions: Record<string, string[]> = {
-  DRAFT: ["INTERNAL_REVIEW", "SENT"],
-  INTERNAL_REVIEW: ["DRAFT", "SENT"],
-  SENT: ["APPROVED", "DECLINED", "EXPIRED"],
-  APPROVED: [],
-  DECLINED: [],
-  EXPIRED: [],
 };
 
 const inputClass =
@@ -173,7 +159,7 @@ export function EstimateTransitionPanel({
   currentStatus: string;
 }) {
   const [state, formAction] = useFormState(action, emptyActionState);
-  const nextStatuses = estimateTransitions[currentStatus] ?? [];
+  const nextStatuses = getEstimateStatusTransitions(currentStatus);
 
   return (
     <form action={formAction} className="space-y-3">
@@ -185,7 +171,7 @@ export function EstimateTransitionPanel({
               key={status}
               name="status"
               value={status}
-              label={estimateStatusLabels[status]}
+              label={getEstimateStatusLabel(status)}
               pendingLabel="Updating"
               icon={ArrowRight}
               tone="secondary"
@@ -193,7 +179,7 @@ export function EstimateTransitionPanel({
           ))
         ) : (
           <span className="inline-flex min-h-11 items-center rounded-md border border-stone-200 bg-stone-100 px-4 text-sm font-semibold text-stone-600">
-            {estimateStatusLabels[currentStatus] ?? currentStatus}
+            {getEstimateStatusLabel(currentStatus)}
           </span>
         )}
       </div>

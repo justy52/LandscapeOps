@@ -1,5 +1,8 @@
 import { z } from "zod";
 import { EstimateStatus } from "@prisma/client";
+import {
+  ESTIMATE_STATUS_TRANSITIONS as CLIENT_SAFE_ESTIMATE_STATUS_TRANSITIONS,
+} from "@/lib/constants/estimate-transitions";
 
 // totalCents is always computed server-side as subtotalCents + taxCents.
 // It is intentionally absent from all input schemas.
@@ -25,14 +28,8 @@ export const UpdateEstimateSchema = z.object({
 
 // Allowed status transitions enforced in the service layer.
 // Terminal states (APPROVED, DECLINED, EXPIRED) have empty arrays — no further transitions.
-export const ESTIMATE_STATUS_TRANSITIONS: Record<EstimateStatus, EstimateStatus[]> = {
-  DRAFT: ["INTERNAL_REVIEW", "SENT"],
-  INTERNAL_REVIEW: ["DRAFT", "SENT"],
-  SENT: ["APPROVED", "DECLINED", "EXPIRED"],
-  APPROVED: [],
-  DECLINED: [],
-  EXPIRED: [],
-};
+export const ESTIMATE_STATUS_TRANSITIONS =
+  CLIENT_SAFE_ESTIMATE_STATUS_TRANSITIONS as Record<EstimateStatus, readonly EstimateStatus[]>;
 
 export const EstimateFilterSchema = z.object({
   status: z.nativeEnum(EstimateStatus).optional(),
